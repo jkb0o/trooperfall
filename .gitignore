@@ -1,2 +1,7 @@
 linux/Debug/*
 linux/Release/*
+Resources/animations/*/*.png
+Resources/animations/*/*.plist
+Resources/animations.plist
+.ropeproject
+

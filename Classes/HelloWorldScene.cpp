@@ -1,5 +1,7 @@
 #include "HelloWorldScene.h"
 #include "Trooper.h"
+#include "CCAnimationCache.h"
+#include "TFAnimationCache.h"
 #include <iostream>
 
 USING_NS_CC;
@@ -67,10 +69,19 @@ bool HelloWorld::init()
 	// position the sprite on the center of the screen
 	pSprite->setPosition( ccp(size.width/2, size.height/2) );
 
+	//CCSpriteFrameCache* cache = CCSpriteFrameCache::sharedSpriteFrameCache();
+	//cache->addSpriteFramesWithFile("animations/big/big_fly.plist");
+	//cache->addSpriteFramesWithFile("animations/big/bigone_die.plist");
+	//cache->addSpriteFramesWithFile("animations/big/test.plist");
+	TFAnimationCache* animCache = (TFAnimationCache*)CCAnimationCache::sharedAnimationCache();
+	animCache->addAnimationsFromFile("animations.plist");
+
 	// add the sprite as a child to this layer
 	this->addChild(pSprite, 0);
-	schedule(schedule_selector(HelloWorld::spawnTrooper), 1);
+	schedule(schedule_selector(HelloWorld::spawnTrooper), 3);
 	spawnTrooper(0.0);
+
+
 
 
 	return true;
@@ -87,8 +98,23 @@ void HelloWorld::spawnTrooper(float dt){
 	pTroop->setPosition(ccp(startPos, size.height + 50));
 	this->addChild(pTroop, 1);
 
-	CCActionInterval* action = CCMoveBy::actionWithDuration(1, CCPointMake(0, -150));
+	CCActionInterval* action = CCMoveBy::actionWithDuration(1, CCPointMake(0, -250));
 	pTroop->runAction(CCRepeatForever::actionWithAction(action));
+
+	pTroop->animate("big_fly", NULL);
+
+	// Cleanup
+	CCArray* nodesToRemove = CCArray::array();
+	for (unsigned int i=0; i<this->getChildrenCount(); i++){
+		CCNode* node = (CCNode*)this->getChildren()->objectAtIndex(i);
+		if ( node->getPosition().y < -100 ) {
+			nodesToRemove->addObject(node);
+		}
+	}
+	this->getChildren()->removeObjectsInArray(nodesToRemove);
+	std::cout << "Children count " << this->getChildren()->count() << "\n";
+	nodesToRemove->release();
+
 }
 
 void HelloWorld::menuCloseCallback(CCObject* pSender)
